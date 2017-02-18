@@ -7,7 +7,7 @@
   - http://demo.watchout.tw/feed/
 - Use `Space Mono` via Google Fonts
   - https://fonts.google.com/specimen/Space+Mono
-- Add script to use Typekit for Chinese characters
+- Add script to use Typekit for Chinese title characters
 
 ```
 <script src="https://use.typekit.net/mub1lty.js"></script>
