@@ -2,6 +2,7 @@
  # -*- coding: utf-8 -*-
 
 import json
+import os
 from feed_maker import *
 from bson import json_util
 from flask import Flask, url_for, send_from_directory, render_template
