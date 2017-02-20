@@ -2,6 +2,7 @@ body{
   color:black;
   font-size:  1rem;
   padding-bottom: 2.5rem;
+  font-family: 'Space Mono', monospace;
 }
 
 h1{font-size:2.25rem; margin: 0;}
@@ -73,7 +74,7 @@ ul li{
 .grid_txt{
   margin: auto;
   margin-top: 2.5rem;
-  width: 19rem;
+  width: 20rem;
   text-align: left;
   line-height: 1.75rem;
 }
@@ -83,7 +84,7 @@ ul li{
 .grid_btn ul{
   height: 5rem;
   margin: auto;
-  width: 42.2rem;
+  width: 43rem;
 }
 .grid_btn_item{
   display: inline-block;
