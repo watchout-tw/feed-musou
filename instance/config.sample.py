@@ -42,3 +42,7 @@ FEED_SUBTITLE = u'國會無雙是沃草的第一個產品，本公司致力於�
     因為我們都有能讓國家更好的權利，而我們應該為了自己、也為了自己珍惜的理念和人們，行使我們的權力。'
 FEED_AUTHOR = {'name': u'沃草', 'email': 'musou@watchout.tw'}
 FEED_LOGO = 'https://feed.musou.tw/static/images/nav-musou-212.png'
+
+# Full Content List
+# EX : [{'name':'test','token':'486e340013ddb40edf00ee3bfa6b601e9cfe05093ffec68cda58279de3f4d6c1'}]
+TOKEN_LIST = []
