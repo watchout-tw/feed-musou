@@ -107,6 +107,8 @@ ul li{
     width: auto;
     height: 15.5rem;
   }
+  .grid_btn_item{width: 100%;}
+  .btn,.btn_info{margin: auto;}
   .logo_arrow_l,.logo_arrow_r{display: block; margin: auto;}
   .logo_arrow_l{margin-bottom: 0.8rem; transform:rotate(90deg);}
   .logo_arrow_r{margin-top: 0.6rem; transform:rotate(-90deg);}
