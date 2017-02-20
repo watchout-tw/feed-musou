@@ -33,6 +33,9 @@ def jsonfeed():
 
 @app.route('/rss')
 def rss():
+    args = request.args   
+    check_token(args)
+    
     xml = open("rss.xml", "r")
     return Response(xml, mimetype='text/xml')
 
@@ -55,6 +58,12 @@ def update(pw):
     else:
         resp = make_response('ERROR', 500)
     return resp
+
+
+def check_token(args):
+    args = request.args
+    if 'token' in args:
+      print 'token=' + args['token']
 
 
 def generate_json(f):
