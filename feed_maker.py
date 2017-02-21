@@ -27,14 +27,18 @@ FEED_AUTHOR = config.FEED_AUTHOR
 FEED_LOGO = config.FEED_LOGO
 
 
-def make_rss():
+def make_rss(option):
     db = MySQLdb.connect(host=config.DB_HOST,    # your host, usually localhost
                         user=config.DB_USERNAME,         # your username
                         passwd=config.DB_PASSWORD,  # your password
                         db=config.DB_DATABASE,  # name of the data base
                         charset='utf8')
     cur = db.cursor()
-    cur.execute(config.DBEXECUTE)
+
+    if option == 'FULL':
+      cur.execute(config.DBEXECUTE_F)
+    else:
+      cur.execute(config.DBEXECUTE)
     db_data = cur.fetchall()
     db.close()
 
@@ -49,51 +53,65 @@ def make_rss():
     fg.language('zh-tw')
 
     for item in db_data:
-        itemdata = pack_data(item, 'rss')
+        itemdata = pack_data(item, 'rss', option)
         fe = fg.add_entry()
         fe.id(itemdata['link'])
         fe.link(href=itemdata['link'], rel='alternate')
         fe.author(name=unicode(itemdata['author']), replace=True)
         fe.title(itemdata['title'])
-        fe.description(itemdata['abstract'] + remore_link(itemdata['link']))
-        # fe.content(content=remore_link(itemdata['link']),type='CDATA')
+        if option == 'FULL':
+          fe.description(itemdata['abstract'])
+          fe.content(content=itemdata['content'],type='CDATA')
+        else:
+          fe.description(itemdata['abstract'] + remore_link(itemdata['link']))
         fe.enclosure(url=itemdata['photo_thumb'], length=u'200', type=u'image/jpeg')
         fe.published(twTime.localize(itemdata['publish_date']))
         fe.category(category=CATEGORY, replace=True)
-    fg.rss_file('rss.xml')
+    if option == 'FULL':
+      fg.rss_file('rss_full.xml')
+    else:
+      fg.rss_file('rss.xml')
 
-
-def make_json():
+def make_json(option):
     db = MySQLdb.connect(host=config.DB_HOST,    # your host, usually localhost
                         user=config.DB_USERNAME,         # your username
                         passwd=config.DB_PASSWORD,  # your password
                         db=config.DB_DATABASE,  # name of the data base
                         charset='utf8')
     cur = db.cursor()
-    cur.execute(config.DBEXECUTE)
+    if option == 'FULL':
+      cur.execute(config.DBEXECUTE_F)
+    else:
+      cur.execute(config.DBEXECUTE)
     datalist = cur.fetchall()
     db.close()
 
     data_dis = []
     for data in datalist:
-      data_dis.append(pack_data(data, 'json'))
+      data_dis.append(pack_data(data, 'json', option))
 
-    with open('rss.json', 'w') as fp:
+    if option == 'FULL':
+      with open('rss_full.json', 'w') as fp:
         json.dump(data_dis, fp)
+        fp.close()
+    else:
+      with open('rss.json', 'w') as fp:
+        json.dump(data_dis, fp)
+        fp.close()
 
 
 def remore_link(link):
     return("<a href='" + link + "'>" + u"（閱讀全文⋯）" + "<a>")
 
 
-def pack_data(data, option):
+def pack_data(data, ftype, option):
 
     data_item = ""
     d_link = ""
     d_category = ""
     d_publish_date = ""
 
-    if option == 'json':
+    if ftype == 'json':
       d_publish_date = int(time.mktime(data[4].timetuple()))
     else:
       d_publish_date = data[4] + datetime.timedelta(hours=8)
@@ -110,14 +128,25 @@ def pack_data(data, option):
     else:
       photo = unicode(PHOTOLINK + str(data[0]) + '/normal_' + data[3])
 
-    data_item = {'id': int(data[0]),
-      'title': data[1],
-      'abstract': data[2],
-      'photo_thumb': photo,
-      'publish_date': d_publish_date,
-      'category': d_category,
-      'author': data[6],
-      'link': d_link}
+    if option == 'FULL':
+      data_item = {'id': int(data[0]),
+        'title': data[1],
+        'abstract': data[2],
+        'photo_thumb': photo,
+        'publish_date': d_publish_date,
+        'category': d_category,
+        'author': data[6],
+        'link': d_link,
+        'content':data[9]}
+    else:
+      data_item = {'id': int(data[0]),
+        'title': data[1],
+        'abstract': data[2],
+        'photo_thumb': photo,
+        'publish_date': d_publish_date,
+        'category': d_category,
+        'author': data[6],
+        'link': d_link}
 
     return data_item
 
@@ -129,13 +158,15 @@ def write_log():
 
     with open('log.json', 'w') as fp:
         json.dump(log, fp)
-
+        fp.close()
 
 if __name__ == "__main__":
     print '[System] Start! \n'
-    make_rss()
+    make_rss('ABSTRACT')
+    make_rss('FULL')
     print '[System] RSS Done!'
-    make_json()
+    make_json('ABSTRACT')
+    make_json('FULL')
     print '[System] JSON Done!'
     write_log()
     print '[System] LOG Done!'

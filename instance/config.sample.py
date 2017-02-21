@@ -16,6 +16,7 @@ DB_DATABASE = ''
 # DB DBEXECUTE
 LIMIT = " LIMIT 10;"
 DBEXECUTE = "" + LIMIT
+DBEXECUTE_F = "" + LIMIT
 
 # URLs
 URL_SITEURL = "https://musou.tw/"
