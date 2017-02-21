@@ -48,11 +48,16 @@ def rss():
     args = request.args
     try:
       xml = ''
-      if check_token(args):
-        xml = open("rss_full.xml", "r")
-        log_token_using(request.args['token'], request.headers['Cf-Connecting-Ip'])
-      else:
-        xml = open("rss.xml", "r")
+      if 'token' in args:
+        for token in config.TOKEN_LIST:
+          if token['token'] == args['token']:
+            if token['name'] == 'LineToday':
+              xml = open("linetoday.xml", "r")
+            else:
+              xml = open("rss_full.xml", "r")
+            log_token_using(request.args['token'], request.headers['Cf-Connecting-Ip'])
+          else:
+            xml = open("rss.xml", "r")
       return Response(xml, mimetype='text/xml')
     except IOError:
       return make_response('ERROR', 500)
@@ -114,9 +119,7 @@ def log_token_using(token, ip):
 
   if os.path.isfile('token_using_log.json'):
     with open('token_using_log.json') as json_data:
-      print json_data
       logdata = json.load(json_data)
-      print logdata
       json_data.close()
     for user in logdata:
       if token == user['token']:

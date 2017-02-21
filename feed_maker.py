@@ -10,7 +10,9 @@ import time
 from pytz import timezone
 import pytz
 from feedgen.feed import FeedGenerator
-
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 twTime = timezone('Asia/Taipei')
 
@@ -91,6 +93,7 @@ def make_json(option):
       data_dis.append(pack_data(data, 'json', option))
 
     if option == 'FULL':
+      make_linetoday(data_dis)
       with open('rss_full.json', 'w') as fp:
         json.dump(data_dis, fp)
         fp.close()
@@ -98,6 +101,35 @@ def make_json(option):
       with open('rss.json', 'w') as fp:
         json.dump(data_dis, fp)
         fp.close()
+
+
+def make_linetoday(datalist):
+
+  timenow = str(int(time.mktime(datetime.datetime.now().timetuple())))
+  XMLHEAD = '<?xml version="1.0" encoding="UTF-8" ?><articles><UUID>watchoutmusou</UUID><time>' + timenow + '000' + '</time>'
+  XMLFOOT = '</articles>'
+  XMLARTICLE = ''
+  for item in datalist:
+    XMLARTICLE += '<article>'
+    XMLARTICLE += '<ID>' + str(item['id']) + '</ID>'
+    XMLARTICLE += '<nativeCountry>TW</nativeCountry><language>zh</language>'
+    XMLARTICLE += '<startYmdtUnix>' + timenow + '</startYmdtUnix>'
+    XMLARTICLE += '<endYmdtUnix>1546300800000</endYmdtUnix>' # 2019/01/01
+    XMLARTICLE += '<title>' + unicode(item['title']) + '</title>'
+    XMLARTICLE += '<category>' + unicode(item['category']) + '</category>'
+    XMLARTICLE += '<publishTimeUnix>' + str(item['publish_date']) + '000' + '</publishTimeUnix>'
+    XMLARTICLE += '<contents>'
+    XMLARTICLE += '<image><url>' + unicode(item['photo_thumb']) + '</url></image>'
+    XMLARTICLE += '<text><content><![CDATA[' + unicode(item['content']) + ']]> </content></text>'
+    XMLARTICLE += '</contents>'
+    XMLARTICLE += '<author>' + unicode(item['author']) + '</author>'
+    XMLARTICLE += '<sourceUrl>' + unicode(item['link']) + '</sourceUrl>'
+    XMLARTICLE += '</article>'
+
+  datapack = XMLHEAD + XMLARTICLE + XMLFOOT
+  with open('linetoday.xml', 'w') as fp:
+    fp.write(datapack)
+    fp.close
 
 
 def remore_link(link):
