@@ -1,8 +1,8 @@
 body {
-  font-family: "Helvetica Neue", "Helvetica", "Arial", "xin-gothic-tc", "PingFang TC", "Noto Sans CJK", "微軟正黑體", sans-serif;
+  font-family: "Space Mono", "Helvetica Neue", "Helvetica", "Arial", "xin-gothic-tc", "PingFang TC", "Noto Sans CJK", "微軟正黑體", sans-serif;
 }
 h1,h2 {
-  font-family: "century-std", "kozuka-mincho-extension", "kozuka-mincho-pr6n", "Kozuka Mincho Pr6N", "PingFang TC", "Noto Sans CJK", "微軟正黑體", sans-serif;
+  font-family: "kozuka-mincho-extension", "kozuka-mincho-pr6n", "Kozuka Mincho Pr6N", "PingFang TC", "Noto Sans CJK", "微軟正黑體", sans-serif;
   font-weight: 900;
 }
 h3, .code {
@@ -10,4 +10,9 @@ h3, .code {
 }
 h3 {
   font-weight: 700;
+}
+.txt_mail {
+  font-family: "Space Mono", "Menlo", "Courier New", "Courier", monospace;
+  font-style: italic;
+  font-weight: normal;
 }
