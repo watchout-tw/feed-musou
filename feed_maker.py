@@ -68,7 +68,7 @@ def make_rss(option):
           fe.description(itemdata['abstract'] + remore_link(itemdata['link']))
         fe.enclosure(url=itemdata['photo_thumb'], length=u'200', type=u'image/jpeg')
         fe.published(twTime.localize(itemdata['publish_date']))
-        fe.category(category=CATEGORY, replace=True)
+        fe.category(category=get_category(itemdata['category']), replace=True)
     if option == 'FULL':
       fg.rss_file('rss_full.xml')
     else:
@@ -130,6 +130,14 @@ def make_linetoday(datalist):
   with open('linetoday.xml', 'w') as fp:
     fp.write(datapack)
     fp.close
+
+
+def get_category(name):
+    res = {'term': '0', 'label': u'沃草國會無雙', 'scheme': SITEURL}
+    for item in CATEGORY:
+      if item['label'] == name:
+        res = item
+    return res
 
 
 def remore_link(link):
