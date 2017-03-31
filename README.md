@@ -1,4 +1,4 @@
-# 沃草《國會無雙》feed
+# 沃草《國會無雙》內容授權釋出
 
 - Homepage design (Use password `commons`)
   - Desktop: https://sketch.cloud/s/vDV1/all/feed/home

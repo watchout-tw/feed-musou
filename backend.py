@@ -58,6 +58,8 @@ def rss():
             log_token_using(request.args['token'], request.headers['Cf-Connecting-Ip'])
           else:
             xml = open("rss.xml", "r")
+      else:
+        xml = open("rss.xml", "r")
       return Response(xml, mimetype='text/xml')
     except IOError:
       return make_response('ERROR', 500)
@@ -162,4 +164,4 @@ def generate_json(f):
 
 
 if __name__ == "__main__":
-  app.run(host='0.0.0.0', port=config.SERVER_PORT, threaded=True, debug=True)
+  app.run(host='0.0.0.0', port=config.SERVER_PORT, threaded=True, debug=False)
