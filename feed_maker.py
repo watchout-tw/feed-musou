@@ -74,6 +74,31 @@ def make_rss(option):
     else:
       fg.rss_file('rss.xml')
 
+
+def make_live_json():
+    db = MySQLdb.connect(host=config.DB_HOST,    # your host, usually localhost
+                        user=config.DB_USERNAME,         # your username
+                        passwd=config.DB_PASSWORD,  # your password
+                        db=config.DB_DATABASE,  # name of the data base
+                        charset='utf8')
+    cur = db.cursor()
+    cur.execute(config.DBEXECUTE_LIVE)
+    datalist = cur.fetchall()
+    db.close()
+    data_dis = []
+    for data in datalist:
+      td = {'id':data[0],
+            'title':unicode(data[1]),
+            'photo_thumb':  unicode(config.URL_LIVEPHOTO + str(data[0]) + '/normal_' + data[2]),
+            'link': config.URL_LIVE + str(data[0]),
+            'state': data[3]}
+      data_dis.append(td)
+
+    with open('live.json', 'w') as fp:
+      json.dump(data_dis, fp)
+      fp.close()
+
+
 def make_json(option):
     db = MySQLdb.connect(host=config.DB_HOST,    # your host, usually localhost
                         user=config.DB_USERNAME,         # your username
@@ -208,5 +233,7 @@ if __name__ == "__main__":
     make_json('ABSTRACT')
     make_json('FULL')
     print '[System] JSON Done!'
-    write_log()
+    make_live_json()
+    print '[System] JSON Done!'
+    # write_log()
     print '[System] LOG Done!'

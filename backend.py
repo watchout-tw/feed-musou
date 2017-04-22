@@ -64,6 +64,18 @@ def rss():
     except IOError:
       return make_response('ERROR', 500)
 
+
+@app.route('/live')
+def live():
+    try:
+      d = ''
+      with open('live.json') as json_data:
+        d = json.load(json_data)
+      return generate_json(d)
+    except IOError:
+      return make_response('ERROR', 500)
+
+
 @app.route('/log')
 def log():
     try:
@@ -73,6 +85,7 @@ def log():
       return generate_json(d)
     except IOError:
       return make_response('ERROR', 500)
+
 
 
 @app.route('/tokenlog/<pw>')

@@ -17,12 +17,15 @@ DB_DATABASE = ''
 LIMIT = " LIMIT 10;"
 DBEXECUTE = "" + LIMIT
 DBEXECUTE_F = "" + LIMIT
+DBEXECUTE_LIVE = "" + " LIMIT 5;"
 
 # URLs
 URL_SITEURL = "https://musou.tw/"
 URL_PHOTOLINK = "https://cdn.musou.tw/uploads/focus/photo_thumb/"
 URL_FOCUSES = "https://musou.tw/focuses/"
 URL_VIDEO = "https://musou.tw/videos/"
+URL_LIVE = "https://musou.tw/live_streams/"
+URL_LIVEPHOTO = "https://cdn.musou.tw/uploads/live_stream/photo_thumb/"
 
 # CATEGORY
 CATEGORY_LABLE_F = u'場邊焦點｜'
