@@ -1,1 +1,9 @@
 .DS_Store
+
+*.pyc
+
+*.xml
+
+*.json
+
+instance/config.py
