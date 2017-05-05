@@ -131,7 +131,7 @@ def make_json(option):
 def make_linetoday(datalist):
 
   timenow = str(int(time.mktime(datetime.datetime.now().timetuple())))
-  XMLHEAD = '<?xml version="1.0" encoding="UTF-8" ?><articles><UUID>watchoutmusou</UUID><time>' + timenow + '000' + '</time>'
+  XMLHEAD = '<?xml version="1.0" encoding="UTF-8" ?><articles><UUID>watchoutmusou' + timenow + '000</UUID><time>' + timenow + '000' + '</time>'
   XMLFOOT = '</articles>'
   XMLARTICLE = ''
   for item in datalist:
@@ -144,7 +144,7 @@ def make_linetoday(datalist):
     XMLARTICLE += '<category>' + unicode(item['category']) + '</category>'
     XMLARTICLE += '<publishTimeUnix>' + str(item['publish_date']) + '000' + '</publishTimeUnix>'
     XMLARTICLE += '<contents>'
-    XMLARTICLE += '<image><url>' + unicode(item['photo_thumb']) + '</url></image>'
+    XMLARTICLE += '<thumbnail><url>' + unicode(item['photo_thumb']) + '</url></thumbnail>'
     XMLARTICLE += '<text><content><![CDATA[' + unicode(item['content']) + ']]> </content></text>'
     XMLARTICLE += '</contents>'
     XMLARTICLE += '<author>' + unicode(item['author']) + '</author>'
