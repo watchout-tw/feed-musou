@@ -138,7 +138,7 @@ def make_linetoday(datalist):
     XMLARTICLE += '<article>'
     XMLARTICLE += '<ID>' + str(item['id']) + '</ID>'
     XMLARTICLE += '<nativeCountry>TW</nativeCountry><language>zh</language>'
-    XMLARTICLE += '<startYmdtUnix>' + timenow + '</startYmdtUnix>'
+    XMLARTICLE += '<startYmdtUnix>' + timenow + '000</startYmdtUnix>'
     XMLARTICLE += '<endYmdtUnix>1546300800000</endYmdtUnix>' # 2019/01/01
     XMLARTICLE += '<title>' + unicode(item['title']) + '</title>'
     XMLARTICLE += '<category>' + unicode(item['category']) + '</category>'
