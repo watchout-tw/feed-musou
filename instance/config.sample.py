@@ -33,7 +33,7 @@ CATEGORY_LABLE_V = u'無雙影音｜'
 
 CATEGORY = [{'term': 'f-1', 'label': CATEGORY_LABLE_F + u'即時新聞', 'scheme': URL_FOCUSES + '?category=1'},
   {'term': 'f-4', 'label': CATEGORY_LABLE_F + u'懶人包', 'scheme': URL_FOCUSES + '?category=4'},
-  {'term': 'f-3', 'label': CATEGORY_LABLE_F + u'深度評論', 'scheme': URL_FOCUSES + '?category=3'},
+  {'term': 'f-3', 'label': CATEGORY_LABLE_F + u'阿草觀點', 'scheme': URL_FOCUSES + '?category=3'},
   {'term': 'f-2', 'label': CATEGORY_LABLE_F + u'影音圖輯', 'scheme': URL_FOCUSES + '?category=2'},
   {'term': 'v-0', 'label': CATEGORY_LABLE_V + u'好球', 'scheme': URL_VIDEO + '?category=0'},
   {'term': 'v-1', 'label': CATEGORY_LABLE_V + u'烏龍球', 'scheme': URL_VIDEO + '?category=1'},
