@@ -61,7 +61,8 @@ def rss():
       else:
         xml = open("rss.xml", "r")
       return Response(xml, mimetype='text/xml')
-    except IOError:
+    except IOError, (errno, strerror):
+      print strerror
       return make_response('ERROR', 500)
 
 
@@ -131,27 +132,28 @@ def log_token_using(token, ip):
   logdata = []
   flag_new_user = 1
   flag_new_ip = 1
-
   if os.path.isfile('token_using_log.json'):
     with open('token_using_log.json') as json_data:
       logdata = json.load(json_data)
       json_data.close()
-    for user in logdata:
-      if token == user['token']:
-        flag_new_user = 0
-        for ipitem in user['ip_list']:
-          if ip == ipitem['ip']:
-            ipitem['count'] += 1
-            ipitem['last_connect_time'] = str(datetime.datetime.now() + datetime.timedelta(hours=8))
-            flag_new_ip = 0
-            break
-        if flag_new_ip == 1:
-          user['ip_list'].append(add_token_using_ip(ip))
+    if len(logdata) == 0:
+      logdata.append(add_token_using_user(token,ip))
+    else :
+      for user in logdata:
+        if token == user['token']:
+          flag_new_user = 0
+          for ipitem in user['ip_list']:
+            if ip == ipitem['ip']:
+              ipitem['count'] += 1
+              ipitem['last_connect_time'] = str(datetime.datetime.now() + datetime.timedelta(hours=8))
+              flag_new_ip = 0
+              break
+          if flag_new_ip == 1:
+            user['ip_list'].append(add_token_using_ip(ip))
   else :
     pass
   if flag_new_user == 1:
     logdata.append(add_token_using_user(token,ip))
-
   with open('token_using_log.json', 'w') as fp:
     json.dump(logdata, fp)
     fp.close()
