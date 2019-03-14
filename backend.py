@@ -55,7 +55,7 @@ def rss():
               xml = open("linetoday.xml", "r")
             else:
               xml = open("rss_full.xml", "r")
-            log_token_using(request.args['token'], request.headers['Cf-Connecting-Ip'])
+            # log_token_using(request.args['token'], request.headers['Cf-Connecting-Ip'])
           else:
             xml = open("rss.xml", "r")
       else:
@@ -66,15 +66,15 @@ def rss():
       return make_response('ERROR', 500)
 
 
-@app.route('/live')
-def live():
-    try:
-      d = ''
-      with open('live.json') as json_data:
-        d = json.load(json_data)
-      return generate_json(d)
-    except IOError:
-      return make_response('ERROR', 500)
+# @app.route('/live')
+# def live():
+#    try:
+#      d = ''
+#      with open('live.json') as json_data:
+#        d = json.load(json_data)
+#      return generate_json(d)
+#    except IOError:
+#      return make_response('ERROR', 500)
 
 
 @app.route('/log')

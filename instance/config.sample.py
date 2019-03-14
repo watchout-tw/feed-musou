@@ -50,3 +50,6 @@ FEED_LOGO = 'https://feed.musou.tw/static/images/nav-musou-212.png'
 # Full Content List
 # EX : [{'name':'test','token':'486e340013ddb40edf00ee3bfa6b601e9cfe05093ffec68cda58279de3f4d6c1'}]
 TOKEN_LIST = []
+
+# bunko 
+BUNKO_URL = 'https://watchout.tw/feed.json'

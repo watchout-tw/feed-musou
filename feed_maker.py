@@ -4,13 +4,16 @@
 import json
 from bson import json_util
 from instance import config
-import MySQLdb
+# import MySQLdb
 import datetime
 import time
 from pytz import timezone
 import pytz
 from feedgen.feed import FeedGenerator
 import sys
+import requests
+import re
+
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -28,33 +31,67 @@ FEED_SUBTITLE = config.FEED_SUBTITLE
 FEED_AUTHOR = config.FEED_AUTHOR
 FEED_LOGO = config.FEED_LOGO
 
+def remove_control_characters(html):
+  def str_to_int(s, default, base=10):
+      if int(s, base) < 0x10000:
+          return unichr(int(s, base))
+      return default
+  html = re.sub(ur"&#(\d+);?", lambda c: str_to_int(c.group(1), c.group(0)), html)
+  html = re.sub(ur"&#[xX]([0-9a-fA-F]+);?", lambda c: str_to_int(c.group(1), c.group(0), base=16), html)
+  html = re.sub(ur"[\x00-\x08\x0b\x0e-\x1f\x7f]", "", html)
+  return html
+
+def entry_db():
+  db_data = ''
+  db = MySQLdb.connect(host=config.DB_HOST,    # your host, usually localhost
+                      user=config.DB_USERNAME,         # your username
+                      passwd=config.DB_PASSWORD,  # your password
+                      db=config.DB_DATABASE,  # name of the data base
+                      charset='utf8')
+  cur = db.cursor()
+
+  if option == 'FULL':
+    cur.execute(config.DBEXECUTE_F)
+  else:
+    cur.execute(config.DBEXECUTE)
+  db_data = cur.fetchall()
+  db.close()
+  return db_data
+
+def entry_bunko():
+  global SITEURL
+  global FEED_TITLE
+  global FEED_SUBTITLE
+  global FEED_AUTHOR
+  global FEED_LOGO
+  r = requests.get(config.BUNKO_URL)
+  r = r.json()
+
+  SITEURL = r['home_page_url']
+  FEED_TITLE = r['title']
+  FEED_SUBTITLE = r['_watchout']['about']
+  FEED_AUTHOR['name'] = r['author']['name']
+  FEED_LOGO = r['icon']
+
+  return r['items']
 
 def make_rss(option):
-    db = MySQLdb.connect(host=config.DB_HOST,    # your host, usually localhost
-                        user=config.DB_USERNAME,         # your username
-                        passwd=config.DB_PASSWORD,  # your password
-                        db=config.DB_DATABASE,  # name of the data base
-                        charset='utf8')
-    cur = db.cursor()
+    # feed_data = ''
+    # feed_data = entry_db()
 
-    if option == 'FULL':
-      cur.execute(config.DBEXECUTE_F)
-    else:
-      cur.execute(config.DBEXECUTE)
-    db_data = cur.fetchall()
-    db.close()
+    feed_data = entry_bunko()
 
     fg = FeedGenerator()
     fg.id(SITEURL)
     fg.title(FEED_TITLE)
-    fg.author({'name': FEED_AUTHOR['name'], 'email': FEED_AUTHOR['email']})
+    fg.author({'name': FEED_AUTHOR['name']})
     fg.link(href=SITEURL, rel='alternate')
     fg.logo(FEED_LOGO)
     fg.subtitle(FEED_SUBTITLE)
     fg.link(href=SITEURL, rel='self')
     fg.language('zh-tw')
 
-    for item in db_data:
+    for item in feed_data:
         itemdata = pack_data(item, 'rss', option)
         fe = fg.add_entry()
         fe.id(itemdata['link'])
@@ -67,7 +104,8 @@ def make_rss(option):
         else:
           fe.description(itemdata['abstract'] + remore_link(itemdata['link']))
         fe.enclosure(url=itemdata['photo_thumb'], length=u'200', type=u'image/jpeg')
-        fe.published(twTime.localize(itemdata['publish_date']))
+        fe.published(itemdata['publish_date'])
+        # fe.published(twTime.localize())
         fe.category(category=get_category(itemdata['category']), replace=True)
     if option == 'FULL':
       fg.rss_file('rss_full.xml')
@@ -76,17 +114,12 @@ def make_rss(option):
 
 
 def make_live_json():
-    db = MySQLdb.connect(host=config.DB_HOST,    # your host, usually localhost
-                        user=config.DB_USERNAME,         # your username
-                        passwd=config.DB_PASSWORD,  # your password
-                        db=config.DB_DATABASE,  # name of the data base
-                        charset='utf8')
-    cur = db.cursor()
-    cur.execute(config.DBEXECUTE_LIVE)
-    datalist = cur.fetchall()
-    db.close()
+    ## db_data = ''
+    ## db_data = entry_db()
+    feed_data = entry_bunko()
+
     data_dis = []
-    for data in datalist:
+    for data in feed_data:
       td = {'id':data[0],
             'title':unicode(data[1]),
             'photo_thumb':  unicode(config.URL_LIVEPHOTO + str(data[0]) + '/normal_' + data[2]),
@@ -100,21 +133,12 @@ def make_live_json():
 
 
 def make_json(option):
-    db = MySQLdb.connect(host=config.DB_HOST,    # your host, usually localhost
-                        user=config.DB_USERNAME,         # your username
-                        passwd=config.DB_PASSWORD,  # your password
-                        db=config.DB_DATABASE,  # name of the data base
-                        charset='utf8')
-    cur = db.cursor()
-    if option == 'FULL':
-      cur.execute(config.DBEXECUTE_F)
-    else:
-      cur.execute(config.DBEXECUTE)
-    datalist = cur.fetchall()
-    db.close()
+    # db_data = ''
+    # db_data = entry_db()
+    feed_data = entry_bunko()
 
     data_dis = []
-    for data in datalist:
+    for data in feed_data:
       data_dis.append(pack_data(data, 'json', option))
 
     if option == 'FULL':
@@ -131,7 +155,7 @@ def make_json(option):
 def make_linetoday(datalist):
 
   timenow = str(int(time.mktime(datetime.datetime.now().timetuple())))
-  XMLHEAD = '<?xml version="1.0" encoding="UTF-8" ?><articles><UUID>watchoutmusou' + timenow + '000</UUID><time>' + timenow + '000' + '</time>'
+  XMLHEAD = '<?xml version="1.0" encoding="UTF-8" ?><articles><UUID>watchout' + timenow + '000</UUID><time>' + timenow + '000' + '</time>'
   XMLFOOT = '</articles>'
   XMLARTICLE = ''
   for item in datalist:
@@ -139,7 +163,7 @@ def make_linetoday(datalist):
     XMLARTICLE += '<ID>' + str(item['id']) + '</ID>'
     XMLARTICLE += '<nativeCountry>TW</nativeCountry><language>zh</language>'
     XMLARTICLE += '<startYmdtUnix>' + timenow + '000</startYmdtUnix>'
-    XMLARTICLE += '<endYmdtUnix>1546300800000</endYmdtUnix>' # 2019/01/01
+    XMLARTICLE += '<endYmdtUnix>1893456000000</endYmdtUnix>' # 2030/01/01 
     XMLARTICLE += '<title>' + unicode(item['title']) + '</title>'
     XMLARTICLE += '<category>' + unicode(item['category']) + '</category>'
     XMLARTICLE += '<publishTimeUnix>' + str(item['publish_date']) + '000' + '</publishTimeUnix>'
@@ -171,6 +195,32 @@ def remore_link(link):
 
 def pack_data(data, ftype, option):
 
+  d_publish_date = ""
+
+  if option == 'FULL':
+    data_item = {'id': data['id'],
+      'title': data['title'],
+      'abstract': data['summary'],
+      'photo_thumb': data['image'],
+      'publish_date': data['date_published'],
+      'category': data['_watchout']['category'],
+      'author': u'沃草',
+      'link': data['url'],
+      'content': remove_control_characters(data['content_html'])}
+  else:
+    data_item = {'id': data['id'],
+      'title': data['title'],
+      'abstract': data['summary'],
+      'photo_thumb': data['image'],
+      'publish_date': data['date_published'],
+      'category': data['_watchout']['category'],
+      'author': u'沃草',
+      'link': data['url']}
+
+  return data_item
+
+def pack_data_db(data, ftype, option):
+
     data_item = ""
     d_link = ""
     d_category = ""
@@ -192,6 +242,7 @@ def pack_data(data, ftype, option):
       photo = ''
     else:
       photo = unicode(PHOTOLINK + str(data[0]) + '/normal_' + data[3])
+    
 
     if option == 'FULL':
       data_item = {'id': int(data[0]),
@@ -233,7 +284,7 @@ if __name__ == "__main__":
     make_json('ABSTRACT')
     make_json('FULL')
     print '[System] JSON Done!'
-    make_live_json()
+    # make_live_json()
     print '[System] JSON Done!'
-    # write_log()
+    write_log()
     print '[System] LOG Done!'
