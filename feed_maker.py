@@ -13,6 +13,7 @@ from feedgen.feed import FeedGenerator
 import sys
 import requests
 import re
+import dateutil.parser
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -159,6 +160,10 @@ def make_linetoday(datalist):
   XMLFOOT = '</articles>'
   XMLARTICLE = ''
   for item in datalist:
+
+    timestr = ''
+    timestr = str(int(time.mktime(datetime.datetime.strptime(item['publish_date'], "%Y-%m-%dT%H:%M:%S.%fZ").timetuple())) *1000)
+    
     XMLARTICLE += '<article>'
     XMLARTICLE += '<ID>' + str(item['id']) + '</ID>'
     XMLARTICLE += '<nativeCountry>TW</nativeCountry><language>zh</language>'
@@ -166,7 +171,7 @@ def make_linetoday(datalist):
     XMLARTICLE += '<endYmdtUnix>1893456000000</endYmdtUnix>' # 2030/01/01 
     XMLARTICLE += '<title>' + unicode(item['title']) + '</title>'
     XMLARTICLE += '<category>' + unicode(item['category']) + '</category>'
-    XMLARTICLE += '<publishTimeUnix>' + str(item['publish_date']) + '000' + '</publishTimeUnix>'
+    XMLARTICLE += '<publishTimeUnix>' + timestr  + '</publishTimeUnix>'
     XMLARTICLE += '<contents>'
     XMLARTICLE += '<thumbnail><url>' + unicode(item['photo_thumb']) + '</url></thumbnail>'
     XMLARTICLE += '<text><content><![CDATA[' + unicode(item['content']) + ']]> </content></text>'
@@ -285,6 +290,6 @@ if __name__ == "__main__":
     make_json('FULL')
     print '[System] JSON Done!'
     # make_live_json()
-    print '[System] JSON Done!'
+    # print '[System] JSON Done!'
     write_log()
     print '[System] LOG Done!'
